@@ -1,3 +1,5 @@
 /.idea/
 /node_modules
 .env
+/Lottery/node_modules
+/graph/node_modules
