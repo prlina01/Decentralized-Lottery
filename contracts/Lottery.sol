@@ -1,60 +1,77 @@
 // SPDX-Licence-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract Lottery is VRFConsumerBase{
-    address public owner;
-    address payable[] public players;
-    uint public lotteryId;
-    mapping (uint => address payable) public lotteryHistory;
+contract Lottery is VRFConsumerBase, Ownable{
+    address[] public players;
+    uint8 maxPlayers;
+    bool public gameStarted;
+    uint256 entryFee;
+    uint256 public gameId;
 
     // Verifiable random function (VRF) variables
     bytes32 internal keyHash; // identifies which Chainlink oracle to use
     uint internal fee;       // fee to get random number (link is to chainlink what gas is to ethereum)
-    uint public randomResult;
 
-    constructor()
-    VRFConsumerBase(0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B,  // VRF coordinator
-        0x01BE23585060835E02B77ef475b0Cc51aA1e0709 // link token address
+
+    event GameStarted(uint256 gameId, uint8 maxPlayers, uint256 entryFee);
+    event PlayerJoined(uint256 gameId, address player);
+    event GameEnded(uint256 gameId, address winner,bytes32 requestId);
+
+
+
+    constructor(address vrfCoordinator, address linkToken,
+        bytes32 vrfKeyHash, uint256 vrfFee)
+    VRFConsumerBase(vrfCoordinator, linkToken
     ) {
-        keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
-        fee = 0.1 * 10 ** 18;
-
-        owner = msg.sender;
-        lotteryId = 1;
+        keyHash = vrfKeyHash ;
+        fee = vrfFee;
+        gameStarted = false;
     }
 
-    function getRandomNumber() public returns (bytes32 requestId) {
+    function getRandomWinner() public returns (bytes32 requestId) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK in the contract");
         return requestRandomness(keyHash, fee);
     }
 
-    function fulfillRandomness(bytes32 requestId, uint randomness) internal override {
-        randomResult = randomness;
-        payWinner();
+    function startGame(uint8 _maxPlayers, uint256 _entryFee) public onlyOwner {
+        require(!gameStarted, "Game is currently running");
+        delete players;
+        maxPlayers = _maxPlayers;
+        gameStarted = true;
+        entryFee = _entryFee;
+        gameId += 1;
+        emit GameStarted(gameId, maxPlayers, entryFee);
     }
 
+    function joinGame() public payable {
+        require(gameStarted, "Game has not been started yet");
+        require(msg.value == entryFee, "Value sent is not equal to entryFee");
+        require(players.length < maxPlayers, "Game is full");
+        players.push(msg.sender);
+        emit PlayerJoined(gameId, msg.sender);
+        if(players.length == maxPlayers) {
+            getRandomWinner();
+        }
+    }
 
-
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
+    function fulfillRandomness(bytes32 requestId, uint randomness) internal override {
+        uint256 winnerIndex = randomness % players.length;
+        address winner = players[winnerIndex];
+        (bool sent,) = winner.call{value: address(this).balance}("");
+        require(sent, "Failed to send Ether");
+        emit GameEnded(gameId, winner,requestId);
+        gameStarted = false;
     }
 
     function getBalance() public view returns (uint) {
         return address(this).balance;
     }
 
-    function getPlayers() public view returns (address payable[] memory) {
-        return players;
-    }
-
-    function getWinnerByLottery(uint lottery_id) public view returns(address payable) {
-        return lotteryHistory[lottery_id];
-    }
 
     function enter() public payable {
         require(msg.value >=  .01 ether, "Didn't pay enough ether!");
@@ -65,16 +82,6 @@ contract Lottery is VRFConsumerBase{
 //        return uint(keccak256(abi.encodePacked(owner, block.timestamp))); // abi.encodePacker adds strings together (can't do s = s1 + s2)
 //    }
 
-    function pickWinner() public onlyOwner {
-        getRandomNumber();
-    }
 
-    function payWinner() public {
-        uint index = randomResult % players.length;
-        players[index].transfer(address(this).balance);
-        lotteryHistory[lotteryId] = players[index];
-        lotteryId += 1;
-        players = new address payable[](0);
-    }
 
 }
