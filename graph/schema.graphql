@@ -1,6 +1,8 @@
-type ExampleEntity @entity {
+type Game @entity {
   id: ID!
-  count: BigInt!
-  gameId: BigInt! # uint256
-  winner: Bytes! # address
+  maxPlayers: Int!
+  entryFee: BigInt!
+  winner: Bytes
+  requestId: Bytes
+  players: [Bytes!]!
 }
