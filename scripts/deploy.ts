@@ -10,7 +10,6 @@ async function main() {
 		KEY_HASH,
 		FEE
 	);
-
 	await lottery.deployed();
 
 
