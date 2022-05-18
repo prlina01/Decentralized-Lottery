@@ -7,6 +7,7 @@ import { FETCH_CREATED_GAME } from "../queries";
 import styles from "../styles/Home.module.css";
 import { subgraphQuery } from "../utils";
 import {JsonRpcSigner} from "@ethersproject/providers";
+import {Col, Container, Row, Spacer} from "@nextui-org/react";
 
 export default function Home() {
 	const zero = BigNumber.from("0");
@@ -16,10 +17,11 @@ export default function Home() {
 	const [entryFee, setEntryFee] = useState(zero);
 	const [maxPlayers, setMaxPlayers] = useState(0);
 	const [gameStarted, setGameStarted] = useState(false);
-	const [players, setPlayers] = useState([]);
+	const [players, setPlayers] = useState<string[]>([]);
 	const [winner, setWinner] = useState();
 	const [logs, setLogs] = useState<string[]>([]);
 	const web3ModalRef = useRef<Web3Modal>(Web3Modal.prototype);
+	const addressRef = useRef<string>("");
 
 	// This is used to force react to rerender the page when we want to
 	// in our case we will use force update to show new logs
@@ -137,7 +139,9 @@ export default function Home() {
 						`${_game.players.length} / ${_game.maxPlayers} already joined 👀 `
 					);
 					_game.players.forEach((player: any) => {
-						_logs.push(`${player} joined 🏃‍♂️`);
+						let slicedPlayer = player.slice(0, Math.floor(player.length/2) - 10) +
+							"..." + player.slice(Math.floor(player.length)/2 + 10)
+						_logs.push(`${slicedPlayer} joined 🏃‍♂️`);
 					});
 				}
 				setEntryFee(BigNumber.from(_game.entryFee));
@@ -173,8 +177,10 @@ export default function Home() {
 
 			const signer = await getProviderOrSigner(true);
 			const address = signer instanceof JsonRpcSigner && await signer.getAddress();
-			if (address !== false && address.toLowerCase() === _owner.toLowerCase()) {
-				setIsOwner(true);
+			if (address !== false) {
+				addressRef.current = address.toLowerCase()
+				if(address.toLowerCase() === _owner.toLowerCase())
+					setIsOwner(true)
 			}
 		} catch (err: any) {
 			console.error(err.message);
@@ -222,6 +228,15 @@ export default function Home() {
 						Choosing winner...
 					</button>
 				);
+			}
+			if(players.includes(addressRef.current)) {
+				return (
+					<>
+						<div className={styles.log}>
+							You have already joined the lottery! 🚀
+						</div>
+					</>
+				)
 			}
 			return (
 				<div>
@@ -274,25 +289,31 @@ export default function Home() {
 				<meta name="description" content="Lottery Dapp" />
 				<link rel="icon" href="" />
 			</Head>
-			<div className={styles.main}>
-				<div>
-					<h1 className={styles.title}>Welcome to the Lottery!</h1>
-					<div className={styles.description}>
-						Its a lottery game where a winner is chosen at random and wins the
-						entire lottery pool
-					</div>
-					{renderButton()}
-					{logs &&
-						logs.map((log, index) => (
-							<div className={styles.log} key={index}>
-								{log}
-							</div>
-						))}
-				</div>
-				<div>
-					<img alt="ALT" className={styles.image} src="/randomWinner.png" />
-				</div>
-			</div>
+			<Spacer y={6} />
+			<Container md>
+				<Row>
+					<Col>
+						<h1 className={styles.title} >Welcome to the Lottery!</h1>
+						<div className={styles.description} >
+							Its a lottery game where a winner is chosen at random and wins the
+							entire lottery pool
+						</div>
+						{renderButton()}
+						{logs &&
+							logs.map((log, index) => (
+								<div  className={styles.log}  key={index}>
+									{log}
+								</div>
+							))}
+					</Col>
+					<Col>
+						<img alt="ALT"  src="/randomWinner.png" />
+					</Col>
+
+				</Row>
+			</Container>
+
+
 
 			<footer className={styles.footer}>
 				Made with &#10084;

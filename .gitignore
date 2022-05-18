@@ -1,4 +1,5 @@
 /.idea/
+/.next/
 /node_modules
 .env
 /Lottery/node_modules

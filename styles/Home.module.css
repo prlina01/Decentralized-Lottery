@@ -1,3 +1,4 @@
+
 .main {
     min-height: 90vh;
     display: flex;
@@ -5,12 +6,13 @@
     justify-content: center;
     align-items: center;
     font-family: "Courier New", Courier, monospace;
+    margin-left: 50px;
 }
+
 
 .footer {
     display: flex;
     padding: 2rem 0;
-    border-top: 1px solid #eaeaea;
     justify-content: center;
     align-items: center;
 }
@@ -22,6 +24,7 @@
     margin: 2%;
     box-shadow: 0 0 15px 4px rgba(0, 0, 0, 0.06);
     border-radius: 10px;
+    margin-left: 50px;
 }
 
 .image {
@@ -33,18 +36,21 @@
 .title {
     font-size: 2rem;
     margin: 2rem 1rem;
+    margin-left: 50px;
 }
 
 .description {
     line-height: 1;
     margin: 2rem 1rem;
     font-size: 1.2rem;
+    margin-left: 50px;
 }
 
 .log {
     line-height: 1rem;
     margin: 1rem 1rem;
     font-size: 1rem;
+    margin-left: 50px;
 }
 
 .button {
@@ -57,12 +63,16 @@
     width: 200px;
     cursor: pointer;
     margin: 2rem 1rem;
+    margin-left: 50px;
+
 }
+
 @media (max-width: 1000px) {
     .main {
         width: 100%;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+
     }
 }
