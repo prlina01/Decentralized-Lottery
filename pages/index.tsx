@@ -200,7 +200,8 @@ export default function Home() {
 				providerOptions: {},
 				disableInjectedProvider: false,
 			});
-			void connectWallet();
+			// void connectWallet();
+
 			void getOwner();
 			void checkIfGameStarted();
 			// setInterval(() => {
@@ -239,7 +240,7 @@ export default function Home() {
 			if(players.includes(addressRef.current)) {
 				return (
 					<>
-					<Text color={'white'}  h3 size={25} css={{mb: '1vh'}}>
+					<Text color={'white'}  h3 size={28} css={{mb: '1vh'}}>
 							You have already joined the lottery! 🚀
 						</Text>
 					</>
@@ -292,7 +293,7 @@ export default function Home() {
 	return (
 		<div>
 			<Head>
-				<title>LW3Punks</title>
+				<title>Lottery</title>
 				<meta name="description" content="Lottery Dapp" />
 				<link rel="icon" href="" />
 			</Head>
@@ -332,6 +333,7 @@ export default function Home() {
 								Join this grandiose lottery for a chance to win big!
 							</Text>
 							{renderButton()}
+							<Spacer y={2}></Spacer>
 							{logs &&
 								logs.map((log, index) => (
 									<>

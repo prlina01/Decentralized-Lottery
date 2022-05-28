@@ -7,7 +7,8 @@
 * Winner is randomly chosen using Chainlink VRF.
 
 ![Screenshot from 2022-05-28 12-57-10](https://user-images.githubusercontent.com/36077702/170822483-e2b44c4f-3e37-4577-8c8a-1d9ff5d80002.png)
-
+### You can access the application here: https://decentralized-lottery.vercel.app/
+*To interact with the app you will need a wallet connected to the **mumbai** testnet.
 
 # Steps to set up the project on your local machine
 **We are going to work with _mumbai_ testnet network while connecting to _Alchemy_.**
