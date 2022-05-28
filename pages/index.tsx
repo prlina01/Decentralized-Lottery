@@ -7,7 +7,7 @@ import { FETCH_CREATED_GAME } from "../queries";
 import styles from "../styles/Home.module.css";
 import { subgraphQuery } from "../utils";
 import {JsonRpcSigner} from "@ethersproject/providers";
-import {Col, Container, Row, Spacer} from "@nextui-org/react";
+import {Button, Card, Col, Container, Row, Spacer, Text} from "@nextui-org/react";
 
 export default function Home() {
 	const zero = BigNumber.from("0");
@@ -22,6 +22,8 @@ export default function Home() {
 	const [logs, setLogs] = useState<string[]>([]);
 	const web3ModalRef = useRef<Web3Modal>(Web3Modal.prototype);
 	const addressRef = useRef<string>("");
+	const isMetamaskRef = useRef(true)
+
 
 	// This is used to force react to rerender the page when we want to
 	// in our case we will use force update to show new logs
@@ -189,7 +191,11 @@ export default function Home() {
 
 	useEffect(() => {
 		if (!walletConnected) {
-			web3ModalRef.current = new Web3Modal({
+			if(typeof window.ethereum == "undefined") {
+				alert('No wallet installed in the browser! You cant interact with the app!')
+				return
+			}
+				web3ModalRef.current = new Web3Modal({
 				network: "mumbai",
 				providerOptions: {},
 				disableInjectedProvider: false,
@@ -207,12 +213,13 @@ export default function Home() {
 	  renderButton: Returns a button based on the state of the dapp
 	*/
 	const renderButton = () => {
-		// If wallet is not connected, return a button which allows them to connect their wllet
+		if(!isMetamaskRef.current) return <Button css={{mt: '10vh'}} disabled={true}>No wallet installed in your browser!</Button>
+		// If wallet is not connected, return a button which allows them to connect their wallet
 		if (!walletConnected) {
 			return (
-				<button onClick={connectWallet} className={styles.button}>
+				<Button css={{mt: '10vh'}} color={'success'} onClick={connectWallet}>
 					Connect your wallet
-				</button>
+				</Button>
 			);
 		}
 
@@ -224,17 +231,17 @@ export default function Home() {
 		if (gameStarted) {
 			if (players.length === maxPlayers) {
 				return (
-					<button className={styles.button} disabled>
+					<Button css={{mt: '10vh'}} color={'success'} disabled>
 						Choosing winner...
-					</button>
+					</Button>
 				);
 			}
 			if(players.includes(addressRef.current)) {
 				return (
 					<>
-						<div className={styles.log}>
+					<Text color={'white'}  h3 size={25} css={{mb: '1vh'}}>
 							You have already joined the lottery! 🚀
-						</div>
+						</Text>
 					</>
 				)
 			}
@@ -289,35 +296,65 @@ export default function Home() {
 				<meta name="description" content="Lottery Dapp" />
 				<link rel="icon" href="" />
 			</Head>
-			<Spacer y={6} />
+			<div className={styles.hideOnDesktop}>
+				<Spacer y={2}  />
+			</div>
+			<div className={styles.hideOnMobile}>
+				<Spacer y={7}  />
+			</div>
 			<Container md>
-				<Row>
-					<Col>
-						<h1 className={styles.title} >Welcome to the Lottery!</h1>
-						<div className={styles.description} >
-							Its a lottery game where a winner is chosen at random and wins the
-							entire lottery pool
-						</div>
-						{renderButton()}
-						{logs &&
-							logs.map((log, index) => (
-								<div  className={styles.log}  key={index}>
-									{log}
-								</div>
-							))}
-					</Col>
-					<Col>
-						<img alt="ALT"  src="/randomWinner.png" />
-					</Col>
+				<Card css={{bgColor: "#2d98da"}}>
+					<Row justify="center" align="center">
+						<Col>
+							<div className={styles.hideOnMobile}>
+								<Text h1
+									  size={55}
+									  css={{
+										  textGradient: "45deg, $blue600 -20%, $purple600 50%",
+										  mb: '1vh',
+										  textAlign: 'center'
+									  }}
+									  weight="bold">Decentralized Lottery
+								</Text>
+							</div>
+							<div className={styles.hideOnDesktop}>
+								<Text h1
+									  size={40}
+									  css={{
+										  textGradient: "45deg, $blue600 -20%, $purple600 50%",
+										  mb: '1vh',
+										  textAlign: 'center'
+									  }}
+									  weight="bold">Decentralized Lottery
+								</Text>
+							</div>
+							<Text  h3 size={25} css={{mb: '10vh'}}>
+								Join this grandiose lottery for a chance to win big!
+							</Text>
+							{renderButton()}
+							{logs &&
+								logs.map((log, index) => (
+									<>
+										<div className={styles.hideOnDesktop}>
+											<Text color={'white'}  h3 size={20} css={{mb: '1vh'}}  key={index}>
+												{log}
+											</Text>
+										</div>
+										<div className={styles.hideOnMobile}>
+											<Text color={'white'}  h3 size={25} css={{mb: '1vh'}}  key={index}>
+												{log}
+											</Text>
+										</div>
+									</>
+								))}
+						</Col>
+						<Col className={styles.hideOnMobile}>
+							<img alt="ALT" src="/crypto-devs.svg"  />
+						</Col>
+					</Row>
 
-				</Row>
+				</Card>
 			</Container>
-
-
-
-			<footer className={styles.footer}>
-				Made with &#10084;
-			</footer>
 		</div>
 	);
 }

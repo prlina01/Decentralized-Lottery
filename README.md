@@ -1,4 +1,4 @@
-![Screenshot from 2022-05-21 22-33-51](https://user-images.githubusercontent.com/36077702/169668162-6e1f48b7-86bd-42b1-9c1a-1222e7d524b9.png)
+![Screenshot from 2022-05-28 13-00-35](https://user-images.githubusercontent.com/36077702/170822615-02131690-e2ce-471b-9559-4e0b20b481f8.png)
 
 ## Features
 * The owner can start a lottery.
@@ -6,8 +6,7 @@
 * Data is stored on The Graph subgraph of the application.
 * Winner is randomly chosen using Chainlink VRF.
 
-![Screenshot from 2022-05-21 22-02-29](https://user-images.githubusercontent.com/36077702/169667283-ee3c02c2-8432-48df-85f4-bfdd40622774.png)
-
+![Screenshot from 2022-05-28 12-57-10](https://user-images.githubusercontent.com/36077702/170822483-e2b44c4f-3e37-4577-8c8a-1d9ff5d80002.png)
 
 
 # Steps to set up the project on your local machine
